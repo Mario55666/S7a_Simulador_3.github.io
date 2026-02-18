@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Comida Saludable · Teoría de los 3 cerebros</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+      background: #1a1a1a;
+      color: #e0e0e0;
+      padding: 25px 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      text-align: center;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #8bc34a; /* verde saludable */
+      border-bottom: 1px solid #3e2e1f;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+    .subtitulo {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto 30px;
+      font-size: 1.1rem;
+      color: #b0a090;
+      font-style: italic;
+    }
+    .contenedor-principal {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      justify-content: center;
+      align-items: stretch;
+      max-width: 1300px;
+      width: 100%;
+    }
+
+    /* Tarjeta del flyer */
+    .cerebro-card {
+      flex: 1 1 480px;
+      background: #2d241c;
+      border-radius: 24px;
+      padding: 20px;
+      box-shadow: 0 20px 30px -10px rgba(0,0,0,0.8), inset 0 0 0 1px #6b4f3a;
+      backdrop-filter: blur(2px);
+    }
+    .botones-capas {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .boton-capa {
+      flex: 1;
+      padding: 12px 5px;
+      border: none;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    .boton-capa.activo {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 rgba(0,0,0,0.4), 0 0 15px currentColor;
+    }
+    .boton-capa.inactivo {
+      opacity: 0.7;
+      filter: grayscale(0.4);
+    }
+    #btnReptiliano { background: #b34b3f; } /* rojo para instinto */
+    #btnLimbico    { background: #8bc34a; color: #1a1a1a; } /* verde emocional */
+    #btnNeocortex  { background: #3c6b7c; } /* azul racional */
+
+    .flyer-wrapper {
+      background: #1e1611;
+      border-radius: 16px;
+      padding: 15px;
+      border: 2px solid #7a5e44;
+      box-shadow: inset 0 0 20px #0a0a0a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .flyer-capas {
+      position: relative;
+      width: 750px;
+      height: 750px;
+      max-width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+      background-color: #2b1f15;
+      background-image: repeating-linear-gradient(45deg, #3e2e1f 0px, #3e2e1f 10px, #4f3e2e 10px, #4f3e2e 20px);
+    }
+
+    /* Todas las imágenes se posicionan absolutas */
+    .flyer-capas img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: opacity 0.3s ease, filter 0.3s ease;
+      pointer-events: none;
+    }
+
+    /* Fondo REPTILIANO - nivel 1 */
+    #imgReptiliano {
+      z-index: 1;
+    }
+
+    /* LÍMBICO - nivel 2 */
+    #imgLimbico {
+      z-index: 2;
+    }
+
+    /* NEOCÓRTEX - nivel 3 (el más alto para que el texto sea legible) */
+    #imgNeocortex {
+      z-index: 3;
+    }
+
+    /* Clases de control visual (no modifican z-index, solo apariencia) */
+    .capa-activa {
+      opacity: 1 !important;
+      filter: blur(0) !important;
+      pointer-events: auto !important;
+    }
+    .capa-desenfocada {
+      opacity: 0.4 !important;
+      filter: blur(3px) !important;
+      pointer-events: auto !important;
+    }
+    .capa-oculta {
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
+    .leyenda-capas {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+      justify-content: center;
+    }
+    .tag {
+      padding: 6px 14px;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      background: #2f2a24;
+      border-left: 4px solid;
+      color: #ddd;
+    }
+    .tag-rept { border-color: #b34b3f; }
+    .tag-limb { border-color: #8bc34a; }
+    .tag-neo  { border-color: #3c6b7c; }
+
+    /* Panel de información */
+    .info-card {
+      flex: 1 1 400px;
+      background: #2d241c;
+      border-radius: 24px;
+      padding: 25px;
+      box-shadow: 0 20px 30px -10px black, inset 0 0 0 1px #6b4f3a;
+      display: flex;
+      flex-direction: column;
+    }
+    .titulo-cerebro {
+      font-size: 2rem;
+      font-weight: 300;
+      margin-bottom: 10px;
+      color: #8bc34a;
+      border-bottom: 1px dashed #7a5e44;
+      padding-bottom: 10px;
+    }
+    .bloque-info {
+      margin: 12px 0;
+      background: #1f1a15;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border-left: 6px solid;
+    }
+    .bloque-info p { margin: 6px 0; line-height: 1.5; }
+    .bloque-rept { border-color: #b34b3f; }
+    .bloque-limb { border-color: #8bc34a; }
+    .bloque-neo  { border-color: #3c6b7c; }
+    .etiqueta {
+      font-weight: 600;
+      color: #8bc34a;
+      text-transform: uppercase;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+    }
+    hr { border: none; height: 1px; background: #3e2e1f; margin: 15px 0; }
+
+    /* Estilos para el formulario de datos del estudiante */
+    .form-estudiante {
+      background: #2b231d;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border: 1px solid #7a5e44;
+    }
+    .form-estudiante h3 {
+      color: #8bc34a;
+      margin-bottom: 15px;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-size: 1.2rem;
+    }
+    .campo-form {
+      margin-bottom: 15px;
+    }
+    .campo-form label {
+      display: block;
+      color: #b0a090;
+      margin-bottom: 5px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .campo-form input {
+      width: 100%;
+      padding: 12px 15px;
+      background: #1f1a15;
+      border: 2px solid #4f3e2e;
+      border-radius: 50px;
+      color: #e0e0e0;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    .campo-form input:focus {
+      outline: none;
+      border-color: #8bc34a;
+      background: #2b231d;
+    }
+    .campo-form input::placeholder {
+      color: #6b5a4a;
+      font-style: italic;
+    }
+
+    /* Cuestionario */
+    .quiz-section {
+      max-width: 900px;
+      width: 100%;
+      margin-top: 40px;
+      background: #2d241c;
+      border-radius: 30px;
+      padding: 30px;
+      box-shadow: 0 20px 30px -10px black, inset 0 0 0 1px #6b4f3a;
+    }
+    .quiz-section h2 {
+      color: #8bc34a;
+      font-weight: 300;
+      margin-bottom: 20px;
+      text-align: center;
+      font-size: 2rem;
+    }
+    .pregunta {
+      background: #1f1a15;
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-left: 8px solid;
+    }
+    .pregunta h3 {
+      margin-bottom: 15px;
+      color: #e0d3c0;
+      font-size: 1.3rem;
+    }
+    .opciones { display: flex; flex-direction: column; gap: 12px; }
+    .opcion {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #2b231d;
+      padding: 10px 18px;
+      border-radius: 50px;
+      border: 1px solid #4f3e2e;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .opcion:hover { background: #3f3228; border-color: #8bc34a; }
+    .opcion input[type="radio"] {
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border: 2px solid #7a5e44;
+      border-radius: 50%;
+      background: #1a1a1a;
+      transition: 0.1s;
+      cursor: pointer;
+    }
+    .opcion input[type="radio"]:checked {
+      background: #8bc34a;
+      border-color: #8bc34a;
+      box-shadow: 0 0 8px #8bc34a;
+    }
+    .opcion label { flex: 1; font-size: 1rem; color: #ddd; cursor: pointer; }
+    .btn-comprobar {
+      background: #8bc34a;
+      border: none;
+      color: #1a1a1a;
+      font-weight: bold;
+      font-size: 1.2rem;
+      padding: 15px 30px;
+      border-radius: 60px;
+      cursor: pointer;
+      transition: 0.2s;
+      margin-top: 15px;
+      width: 100%;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 6px 0 #4f3e2e;
+    }
+    .btn-comprobar:hover {
+      background: #9ccc65;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 0 #4f3e2e;
+    }
+    .resultado-quiz {
+      margin-top: 20px;
+      font-size: 1.3rem;
+      text-align: center;
+      background: #1f1a15;
+      padding: 15px;
+      border-radius: 60px;
+      color: #8bc34a;
+      font-weight: bold;
+    }
+
+    /* Botones de control inferior */
+    .botones-inferiores {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin: 30px 0 20px;
+      flex-wrap: wrap;
+    }
+    .btn-secundario {
+      background: #4f3e2e;
+      color: #8bc34a;
+      border: 2px solid #8bc34a;
+      padding: 12px 25px;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 0 #2b1f15;
+    }
+    .btn-secundario:hover {
+      background: #6b4f3a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #2b1f15;
+    }
+
+    /* Botón de email al docente */
+    .btn-email {
+      display: inline-block;
+      background: #b34b3f;
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+      padding: 12px 30px;
+      border-radius: 50px;
+      margin: 20px auto 10px;
+      border: 1px solid #8bc34a;
+      box-shadow: 0 4px 0 #6d2e26;
+      transition: all 0.2s ease;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .btn-email:hover {
+      background: #c45f52;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 0 #6d2e26;
+    }
+
+    /* Footer */
+    footer {
+      margin-top: 30px;
+      color: #b0a090;
+      font-size: 0.9rem;
+      text-align: center;
+      border-top: 1px solid #3e2e1f;
+      padding-top: 20px;
+      width: 100%;
+      max-width: 1200px;
+    }
+    footer p {
+      margin: 5px 0;
+    }
+    .footer-docente {
+      color: #8bc34a;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🥗 SEMANA 7 · COMIDA SALUDABLE · TRES CEREBROS 🥗</h1>
+<div class="subtitulo">
+  🧠 Diagrama visual del cerebro con las tres capas diferenciadas por color: rojo=reptiliano, amarillo=límbico, azul=neocórtex.
+</div>
+
+<div class="contenedor-principal">
+  <!-- PANEL IZQUIERDO: FLYER INTERACTIVO -->
+  <div class="cerebro-card">
+    <div class="botones-capas">
+      <button id="btnReptiliano" class="boton-capa activo">🐊 REPTILIANO</button>
+      <button id="btnLimbico" class="boton-capa inactivo">🐴 LÍMBICO</button>
+      <button id="btnNeocortex" class="boton-capa inactivo">🧠 NEOCÓRTEX</button>
+    </div>
+
+    <div class="flyer-wrapper">
+      <div class="flyer-capas">
+        <!-- FONDO REPTILIANO (instinto) - siempre visible -->
+        <img id="imgReptiliano"
+             class="capa-imagen capa-activa"
+             src="REPTILIANO.png"
+             alt="Plato de comida saludable"
+             title="Reptiliano: alimento y urgencia"
+             data-capa="reptiliano">
+
+        <!-- LÍMBICO (emociones) - capa intermedia -->
+        <img id="imgLimbico"
+             class="capa-imagen capa-oculta"
+             src="LIMBICO.png"
+             alt="Elementos emocionales: jugo de regalo, slogan"
+             title="Límbico: placer y bienestar"
+             data-capa="limbico">
+
+        <!-- NEOCÓRTEX (racional) - capa superior -->
+        <img id="imgNeocortex"
+             class="capa-imagen capa-oculta"
+             src="NEOCORTEX.png"
+             alt="Datos de contacto y argumentos lógicos"
+             title="Neocórtex: información racional"
+             data-capa="neocortex">
+      </div>
+    </div>
+
+    <div class="leyenda-capas">
+      <span class="tag tag-rept">🐊 Reptiliano: comida, urgencia, amarillo</span>
+      <span class="tag tag-limb">🐴 Límbico: jugo de regalo, verde emocional</span>
+      <span class="tag tag-neo">🧠 Neocórtex: contacto, argumento lógico</span>
+    </div>
+  </div>
+
+  <!-- PANEL DERECHO: INFORMACIÓN SEGÚN CEREBRO ACTIVO -->
+  <div class="info-card">
+    <div class="titulo-cerebro" id="tituloCerebro">🐊 REPTILIANO · INSTINTO & SUPERVIVENCIA</div>
+    <div class="bloque-info bloque-rept" id="elementoFlyer">
+      <span class="etiqueta">✧ ELEMENTO EN EL FLYER ✧</span>
+      <p id="elemTexto">Fotografía de comida, llamado "¡Pide hoy!", fondo amarillo</p>
+    </div>
+    <div class="bloque-info bloque-rept" id="mensajeSub">
+      <span class="etiqueta">🗣️ MENSAJE SUBCONSCIENTE</span>
+      <p id="mensajeTexto"><i>“Alimento disponible, actúa ahora.”</i></p>
+    </div>
+    <hr>
+    <div class="bloque-info bloque-rept" id="descripcion">
+      <span class="etiqueta">🧠 PSICOLOGÍA</span>
+      <p>Activa el instinto de alimentación mediante imagen real de comida y urgencia. Responde a la pregunta “¿Tengo hambre? ¿Sobrevivo?”.</p>
+    </div>
+    <div class="bloque-info bloque-rept" id="pregunta">
+      <span class="etiqueta">❓ PREGUNTA QUE RESPONDE</span>
+      <p>«¿Tengo hambre? ¿Debo conseguir esto ahora?»</p>
+    </div>
+    <div class="bloque-info bloque-rept" id="aplicacion">
+      <span class="etiqueta">💼 APLICACIÓN EN DISEÑO</span>
+      <p>Foto de comida, colores brillantes (amarillo), llamados a la acción urgentes.</p>
+    </div>
+  </div>
+</div>
+
+<!-- BOTONES DE CONTROL INFERIOR -->
+<div class="botones-inferiores">
+  <button class="btn-secundario" id="btnVistaCompleta">🔆 VISTA COMPLETA NÍTIDA</button>
+  <button class="btn-secundario" id="btnResetDesenfoque">🔄 RESTABLECER DESENFOQUE</button>
+</div>
+
+<!-- CUESTIONARIO CON DATOS DEL ESTUDIANTE -->
+<section class="quiz-section">
+  <h2>🔍 CUESTIONARIO 3 CEREBROS · COMIDA SALUDABLE</h2>
+
+  <!-- Campos de identificación del estudiante -->
+  <div class="form-estudiante">
+    <h3>📋 DATOS DEL ESTUDIANTE</h3>
+    <div class="campo-form">
+      <label for="nombre">Nombre y Apellido</label>
+      <input type="text" id="nombre" placeholder="Ej. Juan Pérez" value="">
+    </div>
+    <div class="campo-form">
+      <label for="correo">Correo Electrónico</label>
+      <input type="email" id="correo" placeholder="Ej. juan.perez@utp.edu.pe" value="">
+    </div>
+  </div>
+
+  <div class="pregunta" style="border-left-color:#b34b3f;">
+    <h3>1. ¿Qué elemento activa principalmente el cerebro reptiliano (instinto)?</h3>
+    <div class="opciones">
+      <div class="opcion"><input type="radio" name="q1" value="reptil" id="q1a"><label for="q1a">🐊 La fotografía del plato de comida y el "¡Pide hoy!"</label></div>
+      <div class="opcion"><input type="radio" name="q1" value="limbico" id="q1b"><label for="q1b">🐴 El jugo natural de regalo</label></div>
+      <div class="opcion"><input type="radio" name="q1" value="neo" id="q1c"><label for="q1c">🧠 Los números de contacto</label></div>
+    </div>
+  </div>
+
+  <div class="pregunta" style="border-left-color:#8bc34a;">
+    <h3>2. El cerebro límbico (emociones) se asocia con:</h3>
+    <div class="opciones">
+      <div class="opcion"><input type="radio" name="q2" value="reptil" id="q2a"><label for="q2a">🐊 El fondo amarillo brillante</label></div>
+      <div class="opcion"><input type="radio" name="q2" value="limbico" id="q2b"><label for="q2b">🐴 La promesa de un jugo de regalo y el color verde</label></div>
+      <div class="opcion"><input type="radio" name="q2" value="neo" id="q2c"><label for="q2c">🧠 El argumento "Comer bien ya no es una excusa"</label></div>
+    </div>
+  </div>
+
+  <div class="pregunta" style="border-left-color:#3c6b7c;">
+    <h3>3. ¿Qué información es procesada por el neocórtex (razón) para decidir la compra?</h3>
+    <div class="opciones">
+      <div class="opcion"><input type="radio" name="q3" value="reptil" id="q3a"><label for="q3a">🐊 La imagen del pollo y vegetales</label></div>
+      <div class="opcion"><input type="radio" name="q3" value="limbico" id="q3b"><label for="q3b">🐴 La sensación de bienestar al recibir un regalo</label></div>
+      <div class="opcion"><input type="radio" name="q3" value="neo" id="q3c"><label for="q3c">🧠 Los números de WhatsApp y teléfono</label></div>
+    </div>
+  </div>
+
+  <div class="pregunta" style="border-left-color:#b34b3f;">
+    <h3>4. El mensaje subconsciente “Alimento disponible, actúa ahora” corresponde al:</h3>
+    <div class="opciones">
+      <div class="opcion"><input type="radio" name="q4" value="reptil" id="q4a"><label for="q4a">🐊 Cerebro reptiliano</label></div>
+      <div class="opcion"><input type="radio" name="q4" value="limbico" id="q4b"><label for="q4b">🐴 Cerebro límbico</label></div>
+      <div class="opcion"><input type="radio" name="q4" value="neo" id="q4c"><label for="q4c">🧠 Cerebro neocórtex</label></div>
+    </div>
+  </div>
+
+  <button class="btn-comprobar" id="comprobarQuiz">COMPROBAR RESPUESTAS</button>
+  <div class="resultado-quiz" id="resultadoQuiz">—</div>
+
+  <!-- Botón para enviar mensaje al docente (incluye datos del estudiante y resultado) -->
+  <div style="text-align: center; margin-top: 30px;">
+    <a href="#" class="btn-email" id="btnEnviarDocente">✉️ Enviar resultados al docente</a>
+  </div>
+</section>
+
+<!-- FOOTER ACTUALIZADO CON DOCENTE Y CURSO -->
+<footer>
+  <p class="footer-docente">Docente: Mg Mario Quiroz | Curso: Semiótica de la Imagen · 2026 · Semana 7</p>
+  <p>🥗 Comida Saludable · Basado en la teoría de los tres cerebros de Paul MacLean</p>
+</footer>
+
+<script>
+  (function() {
+    // Datos de cada cerebro para comida saludable
+    const datosComida = {
+      reptiliano: {
+        titulo: "🐊 REPTILIANO · INSTINTO & SUPERVIVENCIA",
+        elemento: "Fotografía de comida, llamado '¡Pide hoy!', fondo amarillo",
+        mensaje: "“Alimento disponible, actúa ahora.”",
+        psicologia: "Activa el instinto de alimentación mediante imagen real de comida y urgencia. Responde a la pregunta “¿Tengo hambre? ¿Sobrevivo?”.",
+        pregunta: "«¿Tengo hambre? ¿Debo conseguir esto ahora?»",
+        aplicacion: "Foto de comida, colores brillantes (amarillo), llamados a la acción urgentes."
+      },
+      limbico: {
+        titulo: "🐴 LÍMBICO · EMOCIÓN & PLACER",
+        elemento: "Jugo natural de regalo, slogan 'SABOR & SALUD', color verde",
+        mensaje: "“Disfruta sin culpa, siéntete bien.”",
+        psicologia: "La promesa de un regalo activa el centro de recompensa. El verde evoca calma y bienestar. Responde a “¿Me gusta?”.",
+        pregunta: "«¿Me hace sentir bien? ¿Es placentero?»",
+        aplicacion: "Ofertas de regalo, colores que transmiten frescura, vínculo emocional con la salud."
+      },
+      neocortex: {
+        titulo: "🧠 NEOCÓRTEX · LÓGICA & PLANIFICACIÓN",
+        elemento: "Números de contacto, argumento 'Comer bien ya no es una excusa'",
+        mensaje: "“Es práctico, justificado y fácil de pedir.”",
+        psicologia: "Proporciona datos racionales (teléfono, WhatsApp) y un argumento lógico que resuelve la objeción de tiempo. Responde a “¿Qué tiene sentido?”.",
+        pregunta: "«¿Cómo pido? ¿Es una decisión inteligente?»",
+        aplicacion: "Información de contacto clara, frases que justifican la compra (sin excusas)."
+      }
+    };
+
+    // Elementos del DOM
+    const imgRept  = document.getElementById('imgReptiliano');
+    const imgLimb  = document.getElementById('imgLimbico');
+    const imgNeo   = document.getElementById('imgNeocortex');
+
+    const btnR = document.getElementById('btnReptiliano');
+    const btnL = document.getElementById('btnLimbico');
+    const btnN = document.getElementById('btnNeocortex');
+    const btnVistaCompleta = document.getElementById('btnVistaCompleta');
+    const btnReset = document.getElementById('btnResetDesenfoque');
+
+    const tituloEl = document.getElementById('tituloCerebro');
+    const elemTexto = document.getElementById('elemTexto');
+    const mensajeTexto = document.getElementById('mensajeTexto');
+    const descripcionP = document.querySelector('#descripcion p');
+    const preguntaP = document.querySelector('#pregunta p');
+    const aplicacionP = document.querySelector('#aplicacion p');
+    const bloques = [
+      document.getElementById('elementoFlyer'),
+      document.getElementById('mensajeSub'),
+      document.getElementById('descripcion'),
+      document.getElementById('pregunta'),
+      document.getElementById('aplicacion')
+    ];
+
+    // Función para aplicar estado visual según el cerebro activo
+    function aplicarEstadoVisual(tipo) {
+      // Quitar clases específicas de las capas
+      [imgRept, imgLimb, imgNeo].forEach(img => {
+        img.classList.remove('capa-activa', 'capa-desenfocada', 'capa-oculta');
+      });
+
+      if (tipo === 'reptiliano') {
+        imgRept.classList.add('capa-activa');
+        imgLimb.classList.add('capa-oculta');
+        imgNeo.classList.add('capa-oculta');
+      } 
+      else if (tipo === 'limbico') {
+        imgLimb.classList.add('capa-activa');
+        imgRept.classList.add('capa-desenfocada');
+        imgNeo.classList.add('capa-oculta');
+      } 
+      else if (tipo === 'neocortex') {
+        imgNeo.classList.add('capa-activa');
+        imgRept.classList.add('capa-desenfocada');
+        imgLimb.classList.add('capa-oculta');
+      }
+    }
+
+    // Actualiza panel de información y botones
+    function activarCerebro(tipo) {
+      const d = datosComida[tipo];
+      tituloEl.textContent = d.titulo;
+      elemTexto.textContent = d.elemento;
+      mensajeTexto.innerHTML = `<i>${d.mensaje}</i>`;
+      descripcionP.textContent = d.psicologia;
+      preguntaP.textContent = d.pregunta;
+      aplicacionP.textContent = d.aplicacion;
+
+      bloques.forEach(b => {
+        b.classList.remove('bloque-rept', 'bloque-limb', 'bloque-neo');
+        if (tipo === 'reptiliano') b.classList.add('bloque-rept');
+        if (tipo === 'limbico')    b.classList.add('bloque-limb');
+        if (tipo === 'neocortex')  b.classList.add('bloque-neo');
+      });
+
+      [btnR, btnL, btnN].forEach(b => {
+        b.classList.remove('activo');
+        b.classList.add('inactivo');
+      });
+      if (tipo === 'reptiliano') { btnR.classList.add('activo'); btnR.classList.remove('inactivo'); }
+      if (tipo === 'limbico')    { btnL.classList.add('activo'); btnL.classList.remove('inactivo'); }
+      if (tipo === 'neocortex')  { btnN.classList.add('activo'); btnN.classList.remove('inactivo'); }
+
+      aplicarEstadoVisual(tipo);
+    }
+
+    // Vista completa: todas las capas nítidas
+    function vistaCompleta() {
+      [imgRept, imgLimb, imgNeo].forEach(img => {
+        img.classList.remove('capa-oculta', 'capa-desenfocada');
+        img.classList.add('capa-activa');
+      });
+
+      // Desmarcar botones de cerebro
+      [btnR, btnL, btnN].forEach(b => {
+        b.classList.remove('activo');
+        b.classList.add('inactivo');
+      });
+    }
+
+    // Restablecer al último cerebro activo (guardamos el estado)
+    let cerebroActual = 'reptiliano';
+    function restablecerDesenfoque() {
+      activarCerebro(cerebroActual);
+    }
+
+    // Sobrescribir activarCerebro para que guarde el estado
+    const originalActivar = activarCerebro;
+    activarCerebro = function(tipo) {
+      cerebroActual = tipo;
+      originalActivar(tipo);
+    };
+
+    // Eventos de botones principales
+    btnR.addEventListener('click', () => activarCerebro('reptiliano'));
+    btnL.addEventListener('click', () => activarCerebro('limbico'));
+    btnN.addEventListener('click', () => activarCerebro('neocortex'));
+
+    // Eventos de clic en imágenes
+    [imgRept, imgLimb, imgNeo].forEach(img => {
+      img.addEventListener('click', e => {
+        const capa = e.currentTarget.getAttribute('data-capa');
+        activarCerebro(capa);
+      });
+    });
+
+    // Botones inferiores
+    btnVistaCompleta.addEventListener('click', vistaCompleta);
+    btnReset.addEventListener('click', () => restablecerDesenfoque());
+
+    // Inicializar
+    activarCerebro('reptiliano');
+
+    // --- CUESTIONARIO Y ENVÍO AL DOCENTE ---
+    const btnComprobar = document.getElementById('comprobarQuiz');
+    const resultadoDiv = document.getElementById('resultadoQuiz');
+    const preguntas = [
+      { name: 'q1', correcta: 'reptil' },
+      { name: 'q2', correcta: 'limbico' },
+      { name: 'q3', correcta: 'neo' },
+      { name: 'q4', correcta: 'reptil' }
+    ];
+
+    let ultimoResultado = '—';
+    btnComprobar.addEventListener('click', () => {
+      let aciertos = 0;
+      preguntas.forEach(p => {
+        const radios = document.getElementsByName(p.name);
+        for (const r of radios) {
+          if (r.checked && r.value === p.correcta) {
+            aciertos++;
+            break;
+          }
+        }
+      });
+      let msg = `🎯 Aciertos: ${aciertos} de ${preguntas.length}`;
+      if (aciertos === preguntas.length) msg += ' · ¡Perfecto, maestro de la nutrición!';
+      else if (aciertos >= 3) msg += ' · Muy bien, casi dominas los tres cerebros.';
+      else msg += ' · Vuelve a intentarlo, observa cada detalle.';
+      resultadoDiv.textContent = msg;
+      ultimoResultado = msg;
+    });
+
+    // Botón enviar al docente (actualiza el href del correo con los datos del estudiante)
+    const btnEnviar = document.getElementById('btnEnviarDocente');
+    btnEnviar.addEventListener('click', (e) => {
+      e.preventDefault();
+      const nombre = document.getElementById('nombre').value.trim() || 'Sin nombre';
+      const correo = document.getElementById('correo').value.trim() || 'Sin correo';
+      const asunto = encodeURIComponent('Resultados cuestionario 3 cerebros - Comida Saludable');
+      const cuerpo = encodeURIComponent(
+        `Estudiante: ${nombre}\nCorreo: ${correo}\n\nResultado: ${ultimoResultado}\n\n(Semana 7 - Comida Saludable)`
+      );
+      window.location.href = `mailto:c12139@utp.edu.pe?subject=${asunto}&body=${cuerpo}`;
+    });
+  })();
+</script>
+
+<!-- Nota: Si las imágenes no existen, se verá un patrón de fondo de respaldo.
+     Se recomienda usar archivos PNG con transparencia para superponer correctamente. -->
+</body>
+</html>
